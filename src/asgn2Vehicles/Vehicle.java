@@ -246,7 +246,7 @@ public abstract class Vehicle {
 		vehInfo += "Vehicle vehID: " + getVehID() + newLine;
 		vehInfo += "Arrival Time: " + getArrivalTime() + newLine;
 		
-		if(isQueued()){
+		if(wasQueued()){
 			vehInfo += "Exit from Queue: " + exitQueueTime + newLine;
 			vehInfo += "Queuing Time: " + (exitQueueTime - getArrivalTime()) + newLine;
 		}else{
