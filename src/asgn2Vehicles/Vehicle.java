@@ -48,6 +48,7 @@ public abstract class Vehicle {
 	private int arrivalTime = 0;
 	private int parkingTime = 0;
 	private int departureTime = 0;
+	private int exitQueueTime = 0;
 	
 	private String vehID = "000AAA";
 	
@@ -169,6 +170,8 @@ public abstract class Vehicle {
 		if(exitTime >= Constants.MAXIMUM_QUEUE_TIME){
 			satisfied = false;
 		}
+		
+		exitQueueTime = exitTime;
 	}
 	
 	/**
@@ -237,7 +240,35 @@ public abstract class Vehicle {
 	 */
 	@Override
 	public String toString() {
-		return getVehID();
+		String newLine = System.getProperty("line.separator");
+		String vehInfo = "";
+		
+		vehInfo += "Vehicle vehID: " + getVehID() + newLine;
+		vehInfo += "Arrival Time: " + getArrivalTime() + newLine;
+		
+		if(isQueued()){
+			vehInfo += "Exit from Queue: " + exitQueueTime + newLine;
+			vehInfo += "Queuing Time: " + (exitQueueTime - getArrivalTime()) + newLine;
+		}else{
+			vehInfo += "Vehicle was not queued" + newLine;
+		}
+
+		
+		if(wasParked){
+			vehInfo += "Entry to Car Park: " + getParkingTime() + newLine;			
+			vehInfo += "Exit from Car Park: " + getDepartureTime() + newLine;
+			vehInfo += "ParkingTime: " + (getDepartureTime() - getParkingTime()) + newLine;
+		}else{
+			vehInfo += "Vehicle was not parked" + newLine;
+		}
+		
+		if(isSatisfied()){
+			vehInfo += "Customer was satisfied" + newLine;
+		} else{
+			vehInfo += "Customer was not satisfied" + newLine;
+		}
+	
+		return vehInfo;
 	}
 
 	/**
