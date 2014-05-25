@@ -51,7 +51,13 @@ public class Car extends Vehicle {
 	 */
 	@Override
 	public String toString() {
-		///TODO
-		return "STRING";
+		String newLine = System.getProperty("line.separator");
+		String vehInfo = super.toString();
+		if(isSmall()){
+			vehInfo += "Car can use small car parking space" + newLine;
+		}else{
+			vehInfo += "Car cannot use small parking space" + newLine;
+		}
+		return vehInfo;
 	}
 }
