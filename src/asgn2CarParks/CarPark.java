@@ -42,6 +42,9 @@ public class CarPark {
 
 	int maxCarSpaces,maxSmallCarSpaces,maxMotorCycleSpaces,maxQueueSize;
 	ArrayList<Vehicle> carPark = new ArrayList<Vehicle>();
+	ArrayList<Vehicle> motoPark = new ArrayList<Vehicle>();
+	ArrayList<Vehicle> smallcarPark = new ArrayList<Vehicle>();
+	
 	ArrayList<Vehicle> queue = new ArrayList<Vehicle>();
 	
 	/**
@@ -162,11 +165,7 @@ public class CarPark {
 	 * @return number of cars in car park, including small cars
 	 */
 	public int getNumCars() {
-		for (Vehicle v : queue) {
-			
-			if(v.)
-			
-		}
+		return carPark.size();
 	}
 	
 	/**
@@ -175,6 +174,7 @@ public class CarPark {
 	 * 			a small car space
 	 */
 	public int getNumMotorCycles() {
+		return motoPark.size();
 	}
 	
 	/**
@@ -183,6 +183,7 @@ public class CarPark {
 	 * 		   not occupying a small car space. 
 	 */
 	public int getNumSmallCars() {
+		return smallcarPark.size();
 	}
 	
 	/**
