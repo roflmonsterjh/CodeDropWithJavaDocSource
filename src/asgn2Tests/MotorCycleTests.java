@@ -24,7 +24,8 @@ import asgn2Vehicles.MotorCycle;
 import asgn2Vehicles.Vehicle;
 
 /**
- * @author hogan, Jarrod Eades
+ * @author hogan
+ * @author Jarrod Eades N8855722
  *
  */
 public class MotorCycleTests {
@@ -651,12 +652,44 @@ public class MotorCycleTests {
 		assertFalse(theSecondVehicle.wasQueued());
 	}
 	
+
+	
+	/************ toString() Tests *************/
+
 	/**
-	 * Test method for {@link asgn2Vehicles.Vehicle#toString()}.
+	 * Test method for {@link asgn2Vehicles.Car#toString()}.
+	 * @throws VehicleException 
 	 */
 	@Test
 	public void testToString() {
-		fail("Not yet implemented"); // TODO
+		System.out.println(theVehicle.toString());
+		fail("Check Console");
 	}
 	
+		// Test the result if queued
+	/**
+	 * Test method for {@link asgn2Vehicles.Car#toString()}.
+	 * @throws VehicleException 
+	 */
+	@Test
+	public void testToStringQueued() throws VehicleException{
+		theVehicle.enterQueuedState();
+		theVehicle.exitQueuedState(EXIT_TIME);
+		System.out.println(theVehicle.toString());
+		fail("Check Console");	
 	}
+
+
+		// Test the result if parked which also checks satisfied
+	/**
+	 * Test method for {@link asgn2Vehicles.Car#toString()}.
+	 * @throws VehicleException 
+	 */
+	@Test
+	public void testToStringParked() throws VehicleException{
+		theVehicle.enterParkedState(PARKING_TIME, INTENDED_DURATION);
+		theVehicle.exitParkedState(DEPARTURE_TIME);
+		System.out.println(theVehicle.toString());
+		fail("Check Console"); 	
+	}
+}
