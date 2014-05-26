@@ -17,7 +17,8 @@ import asgn2Exceptions.VehicleException;
  * This version of the class does not cater for model types, but records whether or not the 
  * vehicle can use a small parking space. 
  * 
- * @author hogan, Jarrod Eades
+ * @author hogan
+ * @authorJarrod Eades N8855722
  *
  */
 public class Car extends Vehicle {

@@ -16,7 +16,8 @@ import asgn2Exceptions.VehicleException;
  * The MotorCycle class is a 'specialisation' of the Vehicle class to cater for motorcycles
  * This version uses only those facilities specified in the Vehicle class 
  * 
- * @author hogan, Jarrod Eades
+ * @author hogan
+ * @author Jarrod Eades N8855722
  *
  */
 public class MotorCycle extends Vehicle {
