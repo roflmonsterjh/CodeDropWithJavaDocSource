@@ -24,7 +24,8 @@ import asgn2Vehicles.MotorCycle;
 import asgn2Vehicles.Vehicle;
 
 /**
- * @author hogan, Jarrod Eades
+ * @author hogan
+ * @author Jarrod Eades N8855722
  *
  */
 public class MotorCycleTests {
