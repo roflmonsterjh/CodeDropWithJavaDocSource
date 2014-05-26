@@ -79,8 +79,9 @@ public class SimulationRunner {
 	/**
 	 * Main program for the simulation 
 	 * @param args Arguments to the simulation 
+	 * @throws SimulationException - if one or more constructor values invalid
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SimulationException {
 		CarPark cp = new CarPark();
 		Simulator s = null;
 		Log l = null; 
@@ -92,7 +93,109 @@ public class SimulationRunner {
 			System.exit(-1);
 		}
 		
-		//TODO: Implement Argument Processing 
+		/**	
+		 * Simulator [meanStay=120.0, sdStay=39.6, seed=100, carProb=1.0, smallCarProb=0.2, mcProb=0.05]
+		 * CarPark [maxCarSpaces: 100 maxSmallCarSpaces: 30 maxMotorCycleSpaces: 20 maxQueueSize: 10]
+		 * @author Jarrod Eades N8855722
+		 */	
+		
+		// Check if there are 10 arguments
+		if(args.length == 10){
+			
+			// Check First Argument 
+			double meanStay = 0.0;
+			try { 
+				meanStay = Double.parseDouble(args[0]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[0] + " must be a double.");
+	        	System.exit(1);
+	    	}
+			
+			// Check Second Argument
+			double sdStay = 0.0;
+			try {
+				sdStay = Double.parseDouble(args[1]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[1] + " must be a double.");
+	        	System.exit(1);
+	    	}
+			
+			// Check Third Argument
+			int seed = 0;
+			try {
+				seed = Integer.parseInt(args[2]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[2] + " must be an integer.");
+	        	System.exit(1);
+	    	}
+			
+			// Check Fourth Argument
+	    	double carProb = 0.0;
+			try {
+				carProb = Double.parseDouble(args[3]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[3] + " must be a double.");
+	        	System.exit(1);
+	    	}
+			
+			// Check Fifth Argument
+			double smallCarProb = 0.0;
+	    	try {
+				smallCarProb = Double.parseDouble(args[4]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[4] + " must be a double.");
+	        	System.exit(1);
+	    	}
+	    	
+	    	// Check Sixth Argument
+	    	double mcProb = 0.0;
+	    	try {
+				mcProb = Double.parseDouble(args[5]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[5] + " must be a double.");
+	        	System.exit(1);
+	    	}
+	    	
+	    	// Check Seventh Argument
+	    	int maxCarSpaces = 0;
+	    	try {
+				maxCarSpaces = Integer.parseInt(args[6]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[6] + " must be an integer.");
+	        	System.exit(1);
+	    	}
+	    	
+	    	// Check Eighth Argument
+	    	int maxSmallCarSpaces = 0;
+	    	try {
+				maxSmallCarSpaces = Integer.parseInt(args[7]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[7] + " must be an integer.");
+	        	System.exit(1);
+	    	}
+	    	
+	    	// Check Ninth Argument
+	    	int maxMotorCycleSpaces = 0;
+	    	try {
+				maxMotorCycleSpaces = Integer.parseInt(args[8]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[8] + " must be an integer.");
+	        	System.exit(1);
+	    	}
+	    	
+	    	// Check Tenth Argument
+	    	int maxQueueSize = 0;
+	    	try {
+				maxQueueSize = Integer.parseInt(args[9]);
+	    	} catch (NumberFormatException e) {
+	        	System.err.println("Argument" + args[9] + " must be an integer.");
+	        	System.exit(1);
+	    	}
+	    	
+	    	// Using the arguments, create the CarPark and Simulator
+			cp = new CarPark(maxCarSpaces, maxSmallCarSpaces, maxMotorCycleSpaces, maxQueueSize);
+			s = new Simulator(seed, meanStay, sdStay, carProb, smallCarProb, mcProb);
+		}
 		
 		//Run the simulation 
 		SimulationRunner sr = new SimulationRunner(cp,s,l);

@@ -238,7 +238,6 @@ public class CarTests {
 	@Test
 	public void testEnterParkedState() throws VehicleException{
 		theVehicle.enterParkedState(PARKING_TIME, INTENDED_DURATION);
-		assert(true);
 	}
 	
 		// Test for Exception when already parked
@@ -323,7 +322,6 @@ public class CarTests {
 	@Test
 	public void testEnterQueuedState() throws VehicleException{
 		theVehicle.enterQueuedState();
-		assert(true);
 	}
 	
 		// Test for Exception when already parked
@@ -356,7 +354,6 @@ public class CarTests {
 	public void testExitParkedState() throws VehicleException{
 		theVehicle.enterParkedState(PARKING_TIME, INTENDED_DURATION);
 		theVehicle.exitParkedState(DEPARTURE_TIME);
-		assert(true);
 	}
 	
 		// Test for Exception when not in parked state
