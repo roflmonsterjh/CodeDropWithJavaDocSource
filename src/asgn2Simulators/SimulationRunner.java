@@ -99,6 +99,12 @@ public class SimulationRunner {
 		 * @author Jarrod Eades N8855722
 		 */	
 		
+		// Check if there are more than 10 arguments
+		if(args.length > 10){
+			System.err.println("There are to many arguments.");
+        	System.exit(1);
+		}
+		
 		// Check if there are 10 arguments
 		if(args.length == 10){
 			
