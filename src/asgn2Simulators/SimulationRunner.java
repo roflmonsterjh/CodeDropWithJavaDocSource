@@ -53,7 +53,7 @@ public class SimulationRunner {
 		for (int time=0; time<=Constants.CLOSING_TIME; time++) {
 			//queue elements exceed max waiting time
 			if (!this.carPark.queueEmpty()) {
-				//carPark.josh();
+				//System.out.print(carPark.getStatus(time));
 				this.carPark.archiveQueueFailures(time);
 			}
 			//vehicles whose time has expired

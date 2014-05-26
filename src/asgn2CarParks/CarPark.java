@@ -53,8 +53,12 @@ public class CarPark {
 	 * Uses default parameters
 	 */
 	public CarPark() {
+		
 		this(Constants.DEFAULT_MAX_CAR_SPACES,Constants.DEFAULT_MAX_SMALL_CAR_SPACES,
 				Constants.DEFAULT_MAX_MOTORCYCLE_SPACES,Constants.DEFAULT_MAX_QUEUE_SIZE);
+		System.out.println(Constants.DEFAULT_MAX_CAR_SPACES + " " + Constants.DEFAULT_MAX_SMALL_CAR_SPACES + " " + 
+				Constants.DEFAULT_MAX_MOTORCYCLE_SPACES + " " + Constants.DEFAULT_MAX_QUEUE_SIZE);
+		
 	}
 	
 	/**
@@ -66,10 +70,10 @@ public class CarPark {
 	 * @param maxQueueSize maximum number of vehicles allowed to queue
 	 */
 	public CarPark(int maxCarSpaces,int maxSmallCarSpaces, int maxMotorCycleSpaces, int maxQueueSize) {
-		maxCarSpaces = this.maxCarSpaces;
-		maxSmallCarSpaces = this.maxSmallCarSpaces;
-		maxMotorCycleSpaces = this.maxMotorCycleSpaces;
-		maxQueueSize = this.maxQueueSize;
+		maxCarSpaces = 100;
+		maxSmallCarSpaces = 20;
+		maxMotorCycleSpaces = 20;
+		maxQueueSize = 10;
 	}
 
 	/**
@@ -82,14 +86,16 @@ public class CarPark {
 	 */
 	public void archiveDepartingVehicles(int time,boolean force) throws VehicleException, SimulationException {
 		
-		for (Vehicle v : queue) {
-			
+		for (Vehicle v : carPark) {
 			if(force || time >= v.getDepartureTime()){
 				unparkVehicle(v,time);
-				
-				/* TODO */
 			}
-			
+		}
+		
+		for (Vehicle m : motoPark) {
+			if(force || time >= m.getDepartureTime()){
+				unparkVehicle(m,time);
+			}
 		}
 		
 	}
@@ -100,7 +106,7 @@ public class CarPark {
 	 * @param v Vehicle to be archived
 	 * @throws SimulationException if vehicle is currently queued or parked
 	 */
-	public void archiveNewVehicle(Vehicle v) throws SimulationException {
+	public void archiveNewVehicle(Vehicle v) throws SimulationException {/* TODO ???? */
 		past.add(v);
 	}
 	
@@ -110,32 +116,27 @@ public class CarPark {
 	 * @throws VehicleException if one or more vehicles not in the correct state or if timing constraints are violated
 	 * @throws SimulationException 
 	 */
-	public void archiveQueueFailures(int time) throws VehicleException, SimulationException {
+	public void archiveQueueFailures(int time) throws VehicleException, SimulationException {/* TODO not sure if correct*/
 		
 		ArrayList<Vehicle> remove = new ArrayList<Vehicle>();
 		
 		for (Vehicle v : queue) {
-			
 			if(time - v.getArrivalTime() >= Constants.MAXIMUM_QUEUE_TIME){
 				//System.out.println("t:" + time + " ar:" + v.getArrivalTime() + " m:" + Constants.MAXIMUM_QUEUE_TIME);
 				remove.add(v);
-				
 			}
-			
 		}
 		
 		for(int i=0; i<remove.size(); i++){
-			
 			exitQueue(remove.get(i), time);
 			numDissatisfied++;
-			
 		}
 		
 	}
 	
 	public void josh(){
 		for(int y=0; y<queue.size(); y++){
-			System.out.print(queue.get(y) + ":");
+			System.out.print(queue.get(y).getVehID() + ":");
 		}
 		System.out.println();
 		
@@ -157,6 +158,7 @@ public class CarPark {
 	 * @return true if car park full, false otherwise
 	 */
 	public boolean carParkFull() {
+		//System.out.println(maxCarSpaces);
 		if(carPark.size() >= maxCarSpaces && motoPark.size() >= maxMotorCycleSpaces && smallcarPark.size() >= maxSmallCarSpaces){
 			return true;			
 		}
@@ -315,7 +317,7 @@ public class CarPark {
 		else if(v instanceof MotorCycle){
 			motoPark.add((MotorCycle) v);
 		}
-		
+
 	}
 
 	/**
@@ -327,6 +329,13 @@ public class CarPark {
 	 * @throws VehicleException if state is incorrect, or timing constraints are violated
 	 */
 	public void processQueue(int time, Simulator sim) throws VehicleException, SimulationException {
+		System.out.println(queue.size());
+		for (Vehicle v : queue) {
+			if(spacesAvailable(v)){
+				parkVehicle(v, time, (int)Constants.DEFAULT_INTENDED_STAY_SD);	
+				System.out.println("qqq");
+			}
+		}
 	}
 
 	/**
@@ -334,7 +343,8 @@ public class CarPark {
 	 * @return true if queue empty, false otherwise
 	 */
 	public boolean queueEmpty() {
-		if(queue.size() <= 0){ return true; }
+		System.out.println(queue.size());
+		if(queue.isEmpty()){ return true; }
 		return false;
 	}
 
@@ -354,7 +364,6 @@ public class CarPark {
 	 * @return true if space available for v, false otherwise 
 	 */
 	public boolean spacesAvailable(Vehicle v) {
-		/*TODO*/
 		if(v instanceof Car){
 			if(((Car) v).isSmall()){
 				if(smallcarPark.size() < maxSmallCarSpaces || carPark.size() < maxCarSpaces){
