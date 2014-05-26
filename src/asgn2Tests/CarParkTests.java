@@ -16,17 +16,25 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import asgn2CarParks.CarPark;
+import asgn2Exceptions.VehicleException;
+
 /**
  * @author hogan
  *
  */
 public class CarParkTests {
 
+	CarPark cp;
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
+		
+		cp = new CarPark();
+		
 	}
 
 	/**
@@ -39,9 +47,10 @@ public class CarParkTests {
 	/**
 	 * Test method for {@link asgn2CarParks.CarPark#archiveDepartingVehicles(int, boolean)}.
 	 */
-	@Test
+	@SuppressWarnings("unused")
+	@Test(expected= VehicleException.class)
 	public void testArchiveDepartingVehicles() {
-		fail("Not yet implemented"); // TODO
+		//cp.archiveDepartingVehicles(time, force);
 	}
 
 	/**

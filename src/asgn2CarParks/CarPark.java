@@ -11,9 +11,6 @@
 package asgn2CarParks;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import asgn2Exceptions.SimulationException;
 import asgn2Exceptions.VehicleException;
@@ -35,16 +32,17 @@ import asgn2Vehicles.Vehicle;
  * The class relies heavily on the asgn2.Vehicle hierarchy, and provides a series of reports 
  * used by the logger. 
  * 
- * @author hogan
+ * @author hogan, Josh Henley
  *
  */
 public class CarPark {
 
-	int maxCarSpaces,maxSmallCarSpaces,maxMotorCycleSpaces,maxQueueSize;
+	int maxCarSpaces,maxSmallCarSpaces,maxMotorCycleSpaces,maxQueueSize,count=0,numDissatisfied=0;
+	String status="";
 	
-	ArrayList<Vehicle> carPark = new ArrayList<Vehicle>();
-	ArrayList<Vehicle> motoPark = new ArrayList<Vehicle>();
-	ArrayList<Vehicle> smallcarPark = new ArrayList<Vehicle>();
+	ArrayList<Car> carPark = new ArrayList<Car>();
+	ArrayList<MotorCycle> motoPark = new ArrayList<MotorCycle>();
+	ArrayList<Car> smallcarPark = new ArrayList<Car>();
 	
 	ArrayList<Vehicle> queue = new ArrayList<Vehicle>();
 	ArrayList<Vehicle> past = new ArrayList<Vehicle>();
@@ -110,21 +108,38 @@ public class CarPark {
 	 * Archive vehicles which have stayed in the queue too long 
 	 * @param time int holding current simulation time 
 	 * @throws VehicleException if one or more vehicles not in the correct state or if timing constraints are violated
+	 * @throws SimulationException 
 	 */
-	public void archiveQueueFailures(int time) throws VehicleException {
+	public void archiveQueueFailures(int time) throws VehicleException, SimulationException {
+		
+		ArrayList<Vehicle> remove = new ArrayList<Vehicle>();
 		
 		for (Vehicle v : queue) {
 			
 			if(time - v.getArrivalTime() >= Constants.MAXIMUM_QUEUE_TIME){
-				
-				v.exitQueuedState(time);
-				past.add(v);
+				//System.out.println("t:" + time + " ar:" + v.getArrivalTime() + " m:" + Constants.MAXIMUM_QUEUE_TIME);
+				remove.add(v);
 				
 			}
 			
 		}
 		
+		for(int i=0; i<remove.size(); i++){
+			
+			exitQueue(remove.get(i), time);
+			numDissatisfied++;
+			
+		}
+		
 	}
+	
+	public void josh(){
+		for(int y=0; y<queue.size(); y++){
+			System.out.print(queue.get(y) + ":");
+		}
+		System.out.println();
+		
+	}//TODO remove this
 	
 	/**
 	 * Simple status showing whether carPark is empty
@@ -174,7 +189,6 @@ public class CarPark {
 	public void exitQueue(Vehicle v,int exitTime) throws SimulationException, VehicleException {
 		v.exitQueuedState(exitTime);
 		queue.remove(queue.lastIndexOf(v));
-		/* TODO store exit time */
 	}
 	
 	/**
@@ -289,7 +303,18 @@ public class CarPark {
 	public void parkVehicle(Vehicle v, int time, int intendedDuration) throws SimulationException, VehicleException {
 		
 		v.enterParkedState(time, intendedDuration);
-		carPark.add(v);
+			
+		if(v instanceof Car){
+			if(((Car) v).isSmall()){
+				smallcarPark.add((Car) v);
+			}
+			else{
+				carPark.add((Car) v);
+			}
+		}
+		else if(v instanceof MotorCycle){
+			motoPark.add((MotorCycle) v);
+		}
 		
 	}
 
@@ -309,7 +334,7 @@ public class CarPark {
 	 * @return true if queue empty, false otherwise
 	 */
 	public boolean queueEmpty() {
-		if(queue.isEmpty()) return true;
+		if(queue.size() <= 0){ return true; }
 		return false;
 	}
 
@@ -330,7 +355,25 @@ public class CarPark {
 	 */
 	public boolean spacesAvailable(Vehicle v) {
 		/*TODO*/
-		return true;
+		if(v instanceof Car){
+			if(((Car) v).isSmall()){
+				if(smallcarPark.size() < maxSmallCarSpaces || carPark.size() < maxCarSpaces){
+					return true;
+				}
+			}
+			else{
+				if(carPark.size() < maxCarSpaces){
+					return true;
+				}
+			}
+		}
+		else if(v instanceof MotorCycle){
+			if(motoPark.size() < maxMotorCycleSpaces || smallcarPark.size() < maxSmallCarSpaces){
+				return true;
+			}
+		}
+		return false;
+		
 	}
 
 
@@ -339,7 +382,7 @@ public class CarPark {
 	 */
 	@Override
 	public String toString() {
-		return "Don't forget to put in this method";
+		return "Don't forget to put in this method";/* TODO */
 	}
 
 	/**
@@ -350,6 +393,49 @@ public class CarPark {
 	 * @throws VehicleException if vehicle creation violates constraints 
 	 */
 	public void tryProcessNewVehicles(int time,Simulator sim) throws VehicleException, SimulationException {
+		
+		if(sim.smallCarTrial()){
+			String vehID = "S" + time;
+			
+			Car s = new Car(vehID, time, true);
+			
+			if(spacesAvailable(s)){
+				parkVehicle(s, time, (int)Constants.DEFAULT_INTENDED_STAY_SD);
+			}
+			else{
+				enterQueue(s);
+			}
+			count++;
+		}
+		
+		if(sim.motorCycleTrial()){
+			String vehID = "M" + time;
+			
+			MotorCycle m = new MotorCycle(vehID, time);
+
+			if(spacesAvailable(m)){
+				parkVehicle(m, time, (int)Constants.DEFAULT_INTENDED_STAY_SD);
+			}
+			else{
+				enterQueue(m);
+			}
+			count++;
+		}
+		
+		if(sim.newCarTrial()){
+			String vehID = "C" + time;
+			
+			Car c = new Car(vehID, time, false);
+			
+			if(spacesAvailable(c)){
+				parkVehicle(c, time, (int)Constants.DEFAULT_INTENDED_STAY_SD);
+			}
+			else{
+				enterQueue(c);
+			}
+			count++;
+		}
+		
 	}
 
 	/**
