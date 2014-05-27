@@ -170,7 +170,6 @@ public class CarPark {
 	 * @throws VehicleException if vehicle not in the correct state 
 	 */
 	public void enterQueue(Vehicle v) throws SimulationException, VehicleException {
-		System.out.println("entering queue");
 		v.enterQueuedState();
 		queue.add(v);
 	}
@@ -416,7 +415,7 @@ public class CarPark {
 		if(sim.smallCarTrial()){
 			String vehID = "S" + count;
 			Car s = new Car(vehID, time, true);
-			System.out.println("s:" + smallcarPark.size() + " c:" + carPark.size() + " : " + spacesAvailable(s));
+			//System.out.println("s:" + smallcarPark.size() + " c:" + carPark.size() + " : " + spacesAvailable(s));
 			if(spacesAvailable(s)){
 				parkVehicle(s, time, (int)Constants.DEFAULT_INTENDED_STAY_SD);
 			}
