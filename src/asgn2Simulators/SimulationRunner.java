@@ -40,7 +40,6 @@ public class SimulationRunner {
 		this.log = log;
 	}
 	
-	
 	/**
 	 * Method to run the simulation from start to finish. Exceptions are propagated upwards from Vehicle,
 	 * Simulation and Log objects as necessary 

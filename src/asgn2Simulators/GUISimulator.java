@@ -17,6 +17,7 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -38,6 +39,8 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RefineryUtilities;
 
+import asgn2CarParks.CarPark;
+
 /**
  * @author hogan
  *
@@ -47,10 +50,10 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 
 	// Initialise the text fields as global to use during events
 		// CarPark
-	JTextField maxCarSpacesTxt;
-	JTextField maxSmallCarSpacesTxt;
-	JTextField maxMotorCycleSpacesTxt;
-	JTextField maxQueueSizeTxt;
+	static JTextField maxCarSpacesTxt;
+	static JTextField maxSmallCarSpacesTxt;
+	static JTextField maxMotorCycleSpacesTxt;
+	static JTextField maxQueueSizeTxt;
 	
 	private static int maxCSpaces;
 	private static int maxSCSpaces;
@@ -58,12 +61,12 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 	private static int maxQSize;
 	
 		// Simulator
-	JTextField seedTxt;
-	JTextField meanStayTxt;
-	JTextField sdStayTxt;
-	JTextField carProbTxt;
-	JTextField smallCarProbTxt;
-	JTextField mCProbTxt;
+	static JTextField seedTxt;
+	static JTextField meanStayTxt;
+	static JTextField sdStayTxt;
+	static JTextField carProbTxt;
+	static JTextField smallCarProbTxt;
+	static JTextField mCProbTxt;
 	
 	private static int seed;
 	private static double meanStay;
@@ -72,7 +75,7 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 	private static double smallCarProb;
 	private static double mCProb;
 
-		// Error Field
+	// Error Field
 	static JTextArea errorArea;
 	private String newLine = "\n";
 	private boolean errorDetected = false;
@@ -82,8 +85,13 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 	final int HEIGHT = 500;
 
 	final String TITLE = "INB370 Car Park Simulation";
-
 	
+	private static int time;
+	private CarPark cp;
+	private Simulator s;
+	
+	ArrayList<int[]> log = new ArrayList<int[]>();
+		
 	/**
 	 * @param arg0
 	 * @throws HeadlessException
@@ -194,11 +202,84 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		
 		// If no errors in the given  values then: 
 		if(!errorDetected){
-			// TODO - run the program
+
+			/*
+			 * 
+			 * ignore this
+			 * 
+			 */
+			
+			maxCSpaces = Integer.parseInt(maxCarSpacesTxt.getText());
+			maxSCSpaces = Integer.parseInt(maxSmallCarSpacesTxt.getText());
+			maxMCSpaces = Integer.parseInt(maxMotorCycleSpacesTxt.getText());
+			maxQSize = Integer.parseInt(maxQueueSizeTxt.getText());
+			
+					
+			// Simulator
+			seed = Integer.parseInt(seedTxt.getText());
+			meanStay = Double.parseDouble(meanStayTxt.getText());
+			sdStay = Double.parseDouble(sdStayTxt.getText());
+			carProb = Double.parseDouble(carProbTxt.getText());
+			smallCarProb = Double.parseDouble(smallCarProbTxt.getText());
+			mCProb = Double.parseDouble(mCProbTxt.getText());
+			
+			try{
+				cp = new CarPark(maxCSpaces, maxSCSpaces, maxMCSpaces, maxQSize);
+				s = new Simulator(seed, meanStay, sdStay, carProb, smallCarProb, mCProb);
+				
+				for (time=0; time<=Constants.CLOSING_TIME; time++) {
+					//queue elements exceed max waiting time
+					if (!cp.queueEmpty()) {
+						cp.archiveQueueFailures(time);
+					}
+					//vehicles whose time has expired
+					if (!cp.carParkEmpty()) {
+						//force exit at closing time, otherwise normal
+						boolean force = (time == Constants.CLOSING_TIME);
+						cp.archiveDepartingVehicles(time, force);
+					}
+					//attempt to clear the queue 
+					if (!cp.carParkFull()) {
+						cp.processQueue(time,s);
+					}
+					// new vehicles from minute 1 until the last hour
+					boolean a = (time >=1);
+					boolean allowed = a && (time <= (Constants.CLOSING_TIME - 60));
+					
+					if (allowed) { 
+						cp.tryProcessNewVehicles(time,s);
+					}
+					
+					
+					int[] g = {cp.getNumCars(),
+							(cp.gcc() + cp.gmm() + cp.gss()),
+							cp.gcc(),
+							cp.gss(),
+							cp.gmm(),
+							cp.queueSize(),
+							cp.numDis() };
+					//System.out.println(cp.queueSize());
+					log.add(g);//add to log to be used in graphs
+					
+				}
+				System.out.println(cp.getNumCars());
+			}
+			catch(Exception e1){
+				e1.printStackTrace();
+			}
+			
+			/*
+			 * 
+			 * 
+			 * seriously ignore this
+			 * 
+			 */
+			
 			statisticMultiLineGraph();
 			summaryBarGraph();
 		}
 	}
+	
 
 	/**
 	 * Creates a JPanel and applies initial settings
@@ -447,7 +528,6 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 	 * Sets the text fields to the constant values
 	 */
 	private static void constantTextFieldInitialisor(){
-		
 		//CarPark Initialise
 		maxCSpaces = Constants.DEFAULT_MAX_CAR_SPACES;
 		maxSCSpaces = Constants.DEFAULT_MAX_SMALL_CAR_SPACES;
@@ -501,13 +581,13 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		
 		//TODO - this section needs the results of the simulation.
 		// Initialize the values
-		int totalCar = 50;
-		int totalSmallCar = 30;
-		int totalMotorCycle = 15;
+		int totalCar = cp.fcar();
+		int totalSmallCar = cp.fscar();
+		int totalMotorCycle = cp.fmcar();
 		
-		int dissatisfiedCar = 25;
-		int dissatisfiedSmallCar = 10;
-		int dissatisfiedMotorCycle = 5;
+		int dissatisfiedCar = cp.fdcar();
+		int dissatisfiedSmallCar = cp.fdscar();
+		int dissatisfiedMotorCycle = cp.fdmcar();
 		// END TODO
 		
 		// Create the data sets
@@ -564,8 +644,6 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 	 */
 	private XYSeriesCollection dataSetCollection(){
     	
-		// TODO - change for the actual time
-		final int time = 10;
 		
 		// Create the XY series
 		final XYSeries numVehicles = new XYSeries("Number of Vehicles");
@@ -578,13 +656,13 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		
 		// TODO - .add(time, value) change for complete
 		for(int timeThrough = 0; timeThrough < time; timeThrough++){
-			numVehicles.add(timeThrough, timeThrough + 1);
-			currentlyParked.add(timeThrough, timeThrough + 2);
-			numCarsInCarPark.add(timeThrough, timeThrough + 4);
-			numSmallCarsInCarPark.add(timeThrough, timeThrough + 3);
-			numMotorCyclesInCarPark.add(timeThrough, timeThrough + 5);
-			numVehInQueue.add(timeThrough, timeThrough + 6);
-			numDissatisfied.add(timeThrough, timeThrough + 7);
+			numVehicles.add(timeThrough, log.get(timeThrough)[0] );
+			currentlyParked.add(timeThrough, log.get(timeThrough)[1] );
+			numCarsInCarPark.add(timeThrough, log.get(timeThrough)[2]);
+			numSmallCarsInCarPark.add(timeThrough, log.get(timeThrough)[3]);
+			numMotorCyclesInCarPark.add(timeThrough, log.get(timeThrough)[4]);
+			numVehInQueue.add(timeThrough, log.get(timeThrough)[5]);
+			numDissatisfied.add(timeThrough, log.get(timeThrough)[6]);
 		}
 		
 		// Create the collection
@@ -592,7 +670,7 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
         
 		// Add to the collection
 		dataSetCollection.addSeries(numVehicles);
-        dataSetCollection.addSeries(currentlyParked);
+		dataSetCollection.addSeries(currentlyParked);
         dataSetCollection.addSeries(numCarsInCarPark);
         dataSetCollection.addSeries(numSmallCarsInCarPark);
         dataSetCollection.addSeries(numMotorCyclesInCarPark);
