@@ -401,7 +401,13 @@ public class CarPark {
 	 */
 	@Override
 	public String toString() {
-		return "Don't forget to put in this method";/* TODO */
+		return "CarPark [count: " + count
+		+ " numCars: " + getNumCars()
+		+ " numSmallCars: " + getNumSmallCars()
+		+ " numMotorCycles: " + getNumMotorCycles()
+		+ " queue: " + (queue.size())
+		+ " numDissatisfied: " + numDissatisfied
+		+ " past: " + past.size() + "]";
 	}
 
 	/**
