@@ -23,7 +23,7 @@ import asgn2Simulators.Simulator;
 import asgn2Vehicles.Car;
 
 /**
- * @author hogan
+ * @author hogan, Joshua Henley N8858594
  *
  */
 public class CarParkTests {
