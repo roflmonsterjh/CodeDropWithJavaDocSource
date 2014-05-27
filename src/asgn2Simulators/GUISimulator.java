@@ -27,6 +27,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+
 /**
  * @author hogan
  *
@@ -204,6 +210,7 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		JPanel runSimPanel = new JPanel();
 		runSimPanel.add(errorPanel, "North");
 		runSimPanel.add(buttonPanel, "South");		
+		
 		// Add the panel to the window
 		frame.add(settingsPanel, "North");
 		frame.add(runSimPanel, "South");
@@ -249,6 +256,8 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 			errorArea.setText(errorArea.getText() + maxCarSpacesTxt.getName() + " is smaller than " 
 					+ maxSmallCarSpacesTxt.getName() + ".");
 		}
+		
+		letsTryToMakeABarGraph();
 	}
 
 
@@ -358,5 +367,44 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		mCProb = Constants.DEFAULT_MOTORCYCLE_PROB;		
 	}
 
-
+	private void letsTryToMakeABarGraph(){
+		
+		// Initialise the data set
+		DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+		
+		// Initialise the values
+		int totalCar = 50;
+		int totalSmallCar = 30;
+		int totalMotorCycle = 15;
+		
+		int disatisfiedCar = 25;
+		int disatisfiedSmallCar = 10;
+		int disatisfiedMotorCycle = 5;
+	
+		// Create the data sets
+		dataSet.setValue(totalCar,"Total Customers","Car");
+		dataSet.setValue(totalSmallCar,"Total Customers","Small Car");
+		dataSet.setValue(totalMotorCycle,"Total Customers","Motor Cycle");
+		
+		dataSet.setValue(disatisfiedCar,"Disatisfied Customers","Car");
+		dataSet.setValue(disatisfiedSmallCar,"Disatisfied Customers","Small Car");
+		dataSet.setValue(disatisfiedMotorCycle,"Disatisfied Customers","Motor Cycle");
+	
+		// Create the chart
+		JFreeChart objChart = ChartFactory.createBarChart(
+			       "Summary Satisfaction levels",     //Chart title
+			    "Vehicle Type",     //Domain axis label
+			    "Customers",         //Range axis label
+			    dataSet,          
+			    PlotOrientation.VERTICAL, 
+			    true,             // include legend
+			    true,             // include tooltips
+			    false             //  don't include URLs
+			);
+		
+		// Create it on a new frame
+		ChartFrame barGraph = new ChartFrame("Demo", objChart);
+		barGraph.pack();
+		barGraph.setVisible(true);
+	}
 }
