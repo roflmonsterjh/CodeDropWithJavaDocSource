@@ -35,16 +35,18 @@ import javax.swing.JTextField;
 public class GUISimulator extends JFrame implements Runnable, ActionListener {
 
 	// Initialise the text fields as global to use during events
+	// CarPark
 	JTextField maxCarSpacesTxt;
 	JTextField maxSmallCarSpacesTxt;
 	JTextField maxMotorCycleSpacesTxt;
 	JTextField maxQueueSizeTxt;
 	
-	private int maxCSpaces = Constants.DEFAULT_MAX_CAR_SPACES;
-	private int maxSCSpaces = Constants.DEFAULT_MAX_SMALL_CAR_SPACES;
-	private int maxMCSpaces = Constants.DEFAULT_MAX_MOTORCYCLE_SPACES;
-	private int maxQSize = Constants.DEFAULT_MAX_QUEUE_SIZE;
+	private static int maxCSpaces;
+	private static int maxSCSpaces;
+	private static int maxMCSpaces;
+	private static int maxQSize;
 	
+	// Simulator
 	JTextField seedTxt;
 	JTextField meanStayTxt;
 	JTextField sdStayTxt;
@@ -52,14 +54,15 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 	JTextField smallCarProbTxt;
 	JTextField mCProbTxt;
 	
-	private int seed = Constants.DEFAULT_SEED;
-	private double meanStay = Constants.DEFAULT_INTENDED_STAY_MEAN;
-	private double sdStay = Constants.DEFAULT_INTENDED_STAY_SD;
-	private double carProb = Constants.DEFAULT_CAR_PROB;
-	private double smallCarProb = Constants.DEFAULT_SMALL_CAR_PROB;
-	private double mCProb = Constants.DEFAULT_MOTORCYCLE_PROB;
-	
-	JTextArea errorArea;
+	private static int seed;
+	private static double meanStay;
+	private static double sdStay;
+	private static double carProb;
+	private static double smallCarProb;
+	private static double mCProb;
+
+	// Error Field
+	static JTextArea errorArea;
 	private String newLine = "\n";
 	
 	/**
@@ -177,7 +180,7 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		
 		// Create an Error box to show invalid inputs
 		JPanel errorPanel = new JPanel();
-		errorArea = new JTextArea(5, 20);
+		errorArea = new JTextArea(10, 25);
 		
 		// Set up a scroll in case of numerous errors
 		JScrollPane areaScrollPane = new JScrollPane(errorArea);
@@ -199,8 +202,8 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		
 		// Create the run simulations panel
 		JPanel runSimPanel = new JPanel();
-		runSimPanel.add(errorPanel);
-		runSimPanel.add(buttonPanel);		
+		runSimPanel.add(errorPanel, "North");
+		runSimPanel.add(buttonPanel, "South");		
 		// Add the panel to the window
 		frame.add(settingsPanel, "North");
 		frame.add(runSimPanel, "South");
@@ -217,6 +220,15 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 	 */
 	public static void main(String[] args) {
 		GUISimulator gui = new GUISimulator(""); //TODO - change "" for args
+
+		if(args.length == 10){
+			constantTextFieldInitialisor();
+		}if(args.length == 0){
+			constantTextFieldInitialisor();
+		}else{
+			errorArea.setText("There were an incorrect amount of arguments passed.");
+			constantTextFieldInitialisor();
+		}
 		gui.run();
 	}
 
@@ -228,27 +240,15 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		reset();
 		
 		// Check Values are greater than zero
-		zeroGreaterThan(maxCarSpacesTxt);
-		zeroGreaterThan(maxMotorCycleSpacesTxt);
-		zeroGreaterThan(maxQueueSizeTxt);
-		zeroGreaterThan(maxSmallCarSpacesTxt);
+		textFieldsGreaterThanZero();
 		
 		// Check that the maxCarSpaces is greater than the maxSmallCarSpaces
 		if(tryGettingInt(maxCarSpacesTxt) < tryGettingInt(maxSmallCarSpacesTxt)){
 			maxCarSpacesTxt.setBackground(Color.RED);
 			maxSmallCarSpacesTxt.setBackground(Color.RED);
+			errorArea.setText(errorArea.getText() + maxCarSpacesTxt.getName() + " is smaller than " 
+					+ maxSmallCarSpacesTxt.getName() + ".");
 		}
-		
-		/*	Check that the values are all in the correct format
-		 *	Already checked maxCarSpaces, maxMotorCycleSpaces
-		 *	, maxQueueSize and maxSmallCarSpaces above
-		 */
-		tryGettingInt(seedTxt);
-		tryGettingDouble(meanStayTxt);
-		tryGettingDouble(sdStayTxt);
-		tryGettingDouble(carProbTxt);
-		tryGettingDouble(smallCarProbTxt);
-		tryGettingDouble(mCProbTxt);
 	}
 
 
@@ -274,29 +274,50 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		return textField;
 	}
 
-	@SuppressWarnings("null")
 	private int tryGettingInt(JTextField text){
+		int i = 0;
 		try{
-			return Integer.parseInt(text.getText());
+			i = Integer.parseInt(text.getText());
 		} catch (NumberFormatException e){
 			text.setBackground(Color.RED);
 			errorArea.setText(errorArea.getText() + text.getName() + " is not a integer (whole number)." + newLine);
-			return (Integer) null;
 		}	
+		return i;
 	}
 	
-	private Double tryGettingDouble(JTextField text){
+	private double tryGettingDouble(JTextField text){
+		double d = 0.0;
 		try{
-			return Double.parseDouble(text.getText());
+			d = Double.parseDouble(text.getText());
 		} catch (NumberFormatException e){
 			text.setBackground(Color.RED);
 			errorArea.setText(errorArea.getText() + text.getName() + " is not a number." + newLine);
-			return (Double) null;
 		}	
+		return d;
 	}
 	
-	private void zeroGreaterThan(JTextField text){
+	private void textFieldsGreaterThanZero(){
+		zeroGreaterThanInt(maxCarSpacesTxt);
+		zeroGreaterThanInt(maxMotorCycleSpacesTxt);
+		zeroGreaterThanInt(maxQueueSizeTxt);
+		zeroGreaterThanInt(maxSmallCarSpacesTxt);
+		zeroGreaterThanInt(seedTxt);
+		zeroGreaterThanDbl(meanStayTxt);
+		zeroGreaterThanDbl(sdStayTxt);
+		zeroGreaterThanDbl(carProbTxt);
+		zeroGreaterThanDbl(smallCarProbTxt);
+		zeroGreaterThanDbl(mCProbTxt);
+	}
+	
+	private void zeroGreaterThanInt(JTextField text){
 		if(0 > tryGettingInt(text)){
+			text.setBackground(Color.RED);
+			errorArea.setText(errorArea.getText() + text.getName() + " is below zero." + newLine);
+		}
+	}
+	
+	private void zeroGreaterThanDbl(JTextField text){
+		if(0 > tryGettingDouble(text)){
 			text.setBackground(Color.RED);
 			errorArea.setText(errorArea.getText() + text.getName() + " is below zero." + newLine);
 		}
@@ -319,5 +340,23 @@ public class GUISimulator extends JFrame implements Runnable, ActionListener {
 		meanStayTxt.setBackground(Color.WHITE);
 		sdStayTxt.setBackground(Color.WHITE);
 	}
+
+	private static void constantTextFieldInitialisor(){
+		
+		//CarPark Initialise
+		maxCSpaces = Constants.DEFAULT_MAX_CAR_SPACES;
+		maxSCSpaces = Constants.DEFAULT_MAX_SMALL_CAR_SPACES;
+		maxMCSpaces = Constants.DEFAULT_MAX_MOTORCYCLE_SPACES;
+		maxQSize = Constants.DEFAULT_MAX_QUEUE_SIZE;
+		
+		// Simulator Initialise
+		seed = Constants.DEFAULT_SEED;
+		meanStay = Constants.DEFAULT_INTENDED_STAY_MEAN;
+		sdStay = Constants.DEFAULT_INTENDED_STAY_SD;
+		carProb = Constants.DEFAULT_CAR_PROB;
+		smallCarProb = Constants.DEFAULT_SMALL_CAR_PROB;
+		mCProb = Constants.DEFAULT_MOTORCYCLE_PROB;		
+	}
+
 
 }
